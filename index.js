@@ -9,7 +9,7 @@ app.use(express.json());
 
 //Mongodb
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.z5uza0f.mongodb.net/?retryWrites=true&w=majority`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -29,7 +29,7 @@ async function run() {
       const database = client.db('prStore');
       //Collection
       const itemsCollection = database.collection('allItems');
-
+      const inHistoryCollection = database.collection('inHistory');
 
 
 
@@ -39,7 +39,22 @@ async function run() {
           const result = await itemsCollection.insertOne(data);
           res.send(result);
       })
-
+    // Get all items
+      app.get('/allItems', async (req, res) => {
+          const result = await itemsCollection.find().toArray();
+          res.send(result);
+      })
+    // History info
+    app.post('/history', async (req, res) => {
+      const data = req.body;
+      const result = await inHistoryCollection.insertOne(data);
+      res.send(result);
+    })
+    //Get all store in history data
+    app.get('/inHistory', async (req, res) => {
+      const result = await inHistoryCollection.find().toArray();
+      res.send(result);
+    })
 
 
     // Send a ping to confirm a successful connection
