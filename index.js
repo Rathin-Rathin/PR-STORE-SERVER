@@ -44,6 +44,7 @@ async function run() {
           const result = await itemsCollection.find().toArray();
           res.send(result);
       })
+    
     // History info
     app.post('/history', async (req, res) => {
       const data = req.body;
@@ -55,7 +56,18 @@ async function run() {
       const result = await inHistoryCollection.find().toArray();
       res.send(result);
     })
-
+    // Update inStore product quantity;
+    app.put('/storeIn/:id', async (req, res) => {
+      const id = req.params.id;
+      const data = req.body;
+      const newQuantity = data.newQnt;
+      const filter = { _id: new ObjectId(id) }
+      const query = {
+        $set:{quantity:newQuantity}
+      }
+      const result = await itemsCollection.updateOne(filter, query);
+      res.send(result);
+    })
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
