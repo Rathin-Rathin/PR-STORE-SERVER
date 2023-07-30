@@ -54,6 +54,7 @@ async function run() {
     //Get all store in history data
     app.get('/inHistory', async (req, res) => {
       const result = await inHistoryCollection.find().toArray();
+      result.reverse();
       res.send(result);
     })
     // Update inStore product quantity;
@@ -68,7 +69,11 @@ async function run() {
       const result = await itemsCollection.updateOne(filter, query);
       res.send(result);
     })
-
+    //Delete storeIn history
+    app.delete('/deleteInHistory', async (req, res) => {
+      const result = await inHistoryCollection.deleteMany({});
+      res.send(result);
+    })
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
