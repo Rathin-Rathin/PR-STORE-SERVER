@@ -30,7 +30,7 @@ async function run() {
       //Collection
       const itemsCollection = database.collection('allItems');
       const inHistoryCollection = database.collection('inHistory');
-
+      const outHistoryCollection = database.collection('outHistory');
 
 
     //Insert items in store
@@ -46,14 +46,25 @@ async function run() {
       })
     
     // History info
-    app.post('/history', async (req, res) => {
+    app.post('/storeInHistory', async (req, res) => {
       const data = req.body;
       const result = await inHistoryCollection.insertOne(data);
+      res.send(result);
+    })
+    app.post('/storeOutHistory', async (req, res) => {
+      const data = req.body;
+      const result = await outHistoryCollection.insertOne(data);
       res.send(result);
     })
     //Get all store in history data
     app.get('/inHistory', async (req, res) => {
       const result = await inHistoryCollection.find().toArray();
+      result.reverse();
+      res.send(result);
+    })
+    //Get all store out history data
+    app.get('/outHistory', async (req, res) => {
+      const result = await outHistoryCollection.find().toArray();
       result.reverse();
       res.send(result);
     })
@@ -69,9 +80,26 @@ async function run() {
       const result = await itemsCollection.updateOne(filter, query);
       res.send(result);
     })
+    //Update outStore product quantity
+    app.put('/storeOut/:id', async (req, res) => {
+      const id = req.params.id;
+      const data = req.body;
+      const newQuantity = data.newQnt;
+      const filter = { _id: new ObjectId(id) }
+      const query = {
+        $set:{quantity:newQuantity}
+      }
+      const result = await itemsCollection.updateOne(filter, query);
+      res.send(result);
+    })
     //Delete storeIn history
     app.delete('/deleteInHistory', async (req, res) => {
       const result = await inHistoryCollection.deleteMany({});
+      res.send(result);
+    })
+    //Delete storeOut history
+    app.delete('/deleteOutHistory', async (req, res) => {
+      const result = await outHistoryCollection.deleteMany({});
       res.send(result);
     })
     // Send a ping to confirm a successful connection
